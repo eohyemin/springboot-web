@@ -31,6 +31,17 @@ deploy:
     local_dir: deploy # before_deploy에서 생성된 디렉토리
     wait-until-deployed: true
 
+  - provider: codedeploy
+    access_key_id: $AWS_ACCESS_KEY # travis repo setting에 설정한 값
+    secret_access_key: $AWS_ACCESS_KEY
+    bucket: springboot-web-build
+    key: springboot-web.zip
+    bundle_type: zip # 압축 확장자
+    application: springboot-web # 콘솔에서 등록한 codedeploy 애플리케이션
+    deployment_group: springboot-web-group # .. codedeploy 배포 그룹
+    region: ap-northeast-2
+    wait-until-deployed: true
+
 before_install:
   - chmod +x gradlew
 
