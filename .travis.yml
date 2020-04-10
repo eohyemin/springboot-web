@@ -15,9 +15,13 @@ cache:
 script: "./gradlew clean build"
 
 before_deploy:
-  - zip -r springboot-web *
-  - mkdir -p deploy
-  - mv springboot-web.zip deploy/springboot-web.zip
+  - mkdir -p before-deploy # zip에 포함시킬 파일들 담는 디렉토리
+  - cp scripts/*.sh before-deploy/
+  - cp appspec.yml before-deploy/
+  - cp build/libs/*.jar before-deploy/
+  - cd before-deploy && zip -r before-deploy * # before-deploy로 이동 후 전체압축
+  - cd ../ && mkdir -p deploy
+  - mv before-deploy/before-deploy.zip deploy/springboot-web.zip
 
 deploy:
   - provider: s3
@@ -30,6 +34,7 @@ deploy:
     acl: private # zip 파일 접근 - private
     local_dir: deploy # before_deploy에서 생성된 디렉토리
     wait-until-deployed: true
+
   - provider: codedeploy
     access_key_id: $AWS_ACCESS_KEY # travis repo setting에 설정한 값
     secret_access_key: $AWS_SECRET_KEY
